@@ -1,6 +1,41 @@
+<!-- TOC -->
+
+- [业务分析](#业务分析)
+    - [iptable用于安全](#iptable用于安全)
+    - [用于NAT](#用于nat)
+- [iptables/netfilter](#iptablesnetfilter)
+    - [参考文档](#参考文档)
+    - [netfilter](#netfilter)
+    - [iptables](#iptables)
+        - [iptables示例](#iptables示例)
+    - [nftables](#nftables)
+- [conntrack](#conntrack)
+
+<!-- /TOC -->
+
+
+# 业务分析
+
+## iptable用于安全
+
+就是permit、deny一些规则，在FWG链
+
+## 用于NAT
+
+iptables配合conntrack，可以用于NAT
+SNAT在postrouting，DNAT在prerouting做
+
 # iptables/netfilter
 
 `iptables`是一个配置`Linux`内核防火墙的命令行工具，它基于内核的`netfilter`机制。新版本的内核（3.13+）也提供了`nftables`，用于取代`iptables`。
+
+## 参考文档
+
+- [A Deep Dive into Iptables and Netfilter Architecture](https://www.digitalocean.com/community/tutorials/a-deep-dive-into-iptables-and-netfilter-architecture)
+- [netfilter.org](http://www.netfilter.org/)
+- [archlinux wiki - iptables](https://wiki.archlinux.org/index.php/Iptables)
+- [nftables wiki](https://wiki.nftables.org/wiki-nftables/index.php/Main_Page)
+- [Linux数据包路由原理、Iptables/netfilter入门学习](http://www.cnblogs.com/LittleHann/p/3708222.html)
 
 ## netfilter
 
@@ -26,15 +61,15 @@
 
 Tables↓/Chains→               | PREROUTING | INPUT | FORWARD | OUTPUT | POSTROUTING
 ----------------------------- |:----------:|:-----:|:-------:|:------:|:-----------:
-(routing decision)            |            |       |         |   ✓    |            
-**raw**                       |     ✓      |       |         |   ✓    |            
-(connection tracking enabled) |     ✓      |       |         |   ✓    |            
-**mangle**                    |     ✓      |   ✓   |    ✓    |   ✓    |      ✓     
-**nat** (DNAT)                |     ✓      |       |         |   ✓    |            
-(routing decision)            |     ✓      |       |         |   ✓    |            
-**filter**                    |            |   ✓   |    ✓    |   ✓    |            
-**security**                  |            |   ✓   |    ✓    |   ✓    |            
-**nat** (SNAT)                |            |   ✓   |         |        |      ✓     
+(routing decision)            |            |       |         |   ✓    |
+**raw**                       |     ✓      |       |         |   ✓    |
+(connection tracking enabled) |     ✓      |       |         |   ✓    |
+**mangle**                    |     ✓      |   ✓   |    ✓    |   ✓    |      ✓
+**nat** (DNAT)                |     ✓      |       |         |   ✓    |
+(routing decision)            |     ✓      |       |         |   ✓    |
+**filter**                    |            |   ✓   |    ✓    |   ✓    |
+**security**                  |            |   ✓   |    ✓    |   ✓    |
+**nat** (SNAT)                |            |   ✓   |         |        |      ✓
 
 所有链默认都是没有任何规则的，用户可以按需要添加规则。每条规则都包括匹配和动作两部分：
 
@@ -177,10 +212,9 @@ nft delete rule filter output
 nft flush table filter
 ```
 
-## 参考文档
+# conntrack
 
-- [A Deep Dive into Iptables and Netfilter Architecture](https://www.digitalocean.com/community/tutorials/a-deep-dive-into-iptables-and-netfilter-architecture)
-- [netfilter.org](http://www.netfilter.org/)
-- [archlinux wiki - iptables](https://wiki.archlinux.org/index.php/Iptables)
-- [nftables wiki](https://wiki.nftables.org/wiki-nftables/index.php/Main_Page)
-- [Linux数据包路由原理、Iptables/netfilter入门学习](http://www.cnblogs.com/LittleHann/p/3708222.html)
+有很多conntrack
+- iptable中有，目的为了NAT
+- TCP部分有，不确定是否与这里是相同的代码
+- OVS中有，参考[ovs-kernel]()
